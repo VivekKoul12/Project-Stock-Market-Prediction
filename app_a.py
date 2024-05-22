@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -9,7 +8,6 @@ import plotly.graph_objs as go
 import datetime as dt
 
 # Load ticker.csv file into a Pandas DataFrame
-
 def load_data():
     df = pd.read_csv('ticker.csv')
     return df
@@ -19,12 +17,10 @@ df = load_data()
 user_input = st.text_input('Enter Company Name')
 
 # Filter DataFrame based on user input to find matching company names
-#contains matches the substring like if we write app then the compines started with app will be made into the df
 matching_companies = df[df['Company Name'].str.contains(
     user_input, case=False)]
 
 # Display the matching company names as recommendations
-#here the data frame created based on input will be shown
 if not matching_companies.empty:
     selected_company = st.selectbox(
         "Select a Company:", matching_companies['Company Name'])
@@ -37,7 +33,7 @@ else:
 # Create a Plotly figure for the Closing Price vs Time chart
 if st.button('Submit'):
     try:
-        df = yf.download(user_input, start='2010-01-01', end=dt.datetime.now())
+        df = yf.download(user_input, start='2000-01-01', end=dt.datetime.now())
 
         # Check if the data size is less than 2 years (approximately 730 days)
         if len(df) < 730:
@@ -58,9 +54,31 @@ if st.button('Submit'):
         # Display the interactive Plotly chart
         st.plotly_chart(fig)
 
-
-        # Calculate 100-day and 200-day Moving Averages
+        # Calculate 100-day Moving Average
         ma100 = df['Close'].rolling(window=100).mean()
+
+        # Create a Plotly figure for the Closing Price vs Time chart with 100MA
+        fig = go.Figure()
+
+        # Add trace for 100-day Moving Average
+        fig.add_trace(go.Scatter(x=df.index, y=ma100, mode='lines',
+                                name='100-day Moving Average', line=dict(color='red')))
+
+        # Add trace for closing price
+        fig.add_trace(go.Scatter(
+            x=df.index, y=df['Close'], mode='lines', name='Closing Price', line=dict(color='blue')))
+
+        # Customize layout
+        fig.update_layout(
+            title='Closing Price vs Time with 100-day Moving Average',
+            xaxis_title='Date',
+            yaxis_title='Price',
+        )
+
+        # Display the interactive Plotly chart
+        st.plotly_chart(fig)
+
+        # Calculate 200-day Moving Averages
         ma200 = df['Close'].rolling(window=200).mean()
 
         # Create a Plotly figure for the Closing Price vs Time chart with 100MA & 200MA
@@ -84,22 +102,6 @@ if st.button('Submit'):
             xaxis_title='Date',
             yaxis_title='Price',
         )
-        height = 600,  # Set the height of the figure
-        width = 1000
-
-        # Display the interactive Plotly chart
-        st.plotly_chart(fig)
-
-       
-
-        # Customize layout
-        fig.update_layout(
-            title='Predictions vs Original',
-            xaxis_title='Date',
-            yaxis_title='Price',
-        )
-        height = 600,  # Set the height of the figure
-        width = 1000
 
         # Display the interactive Plotly chart
         st.plotly_chart(fig)
