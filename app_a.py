@@ -33,7 +33,7 @@ else:
 # Create a Plotly figure for the Closing Price vs Time chart
 if st.button('Submit'):
     try:
-        df = yf.download(user_input, start='2000-01-01', end=dt.datetime.now())
+        df = yf.download(user_input, start='2010-01-01', end=dt.datetime.now())
 
         # Check if the data size is less than 2 years (approximately 730 days)
         if len(df) < 730:
@@ -56,28 +56,6 @@ if st.button('Submit'):
 
         # Calculate 100-day Moving Average
         ma100 = df['Close'].rolling(window=100).mean()
-
-        # Create a Plotly figure for the Closing Price vs Time chart with 100MA
-        fig = go.Figure()
-
-        # Add trace for 100-day Moving Average
-        fig.add_trace(go.Scatter(x=df.index, y=ma100, mode='lines',
-                                name='100-day Moving Average', line=dict(color='red')))
-
-        # Add trace for closing price
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df['Close'], mode='lines', name='Closing Price', line=dict(color='blue')))
-
-        # Customize layout
-        fig.update_layout(
-            title='Closing Price vs Time with 100-day Moving Average',
-            xaxis_title='Date',
-            yaxis_title='Price',
-        )
-
-        # Display the interactive Plotly chart
-        st.plotly_chart(fig)
-
         # Calculate 200-day Moving Averages
         ma200 = df['Close'].rolling(window=200).mean()
 
